@@ -17,7 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->api([
+            \App\Http\Middleware\SecurityLogMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
 
@@ -51,6 +53,8 @@ return Application::configure(basePath: dirname(__DIR__))
             Throwable $e,
             Request $request,
         ) {
+            report($e);
+
             if (! $request->expectsJson()) {
                 return null;
             }
