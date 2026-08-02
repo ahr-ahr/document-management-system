@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\Database\DatabaseInstaller;
 use Illuminate\Console\Command;
 
 class DatabaseInitCommand extends Command
@@ -19,9 +20,13 @@ class DatabaseInitCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle(DatabaseInstaller $installer): int
     {
         $this->info('Starting database initialization...');
+        $this->newLine();
+
+        $installer->initialize();
+
         $this->newLine();
 
         $this->info('Database initialization completed.');
