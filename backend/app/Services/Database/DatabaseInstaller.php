@@ -6,6 +6,7 @@ class DatabaseInstaller
 {
     public function __construct(
         protected SqlScanner $scanner,
+        protected SqlExecutor $executor,
     ) {
     }
 
@@ -13,6 +14,13 @@ class DatabaseInstaller
     {
         $files = $this->scanner->scan();
 
-        dump($files);
+        foreach ($files as $file) {
+            $sql = $this->executor->execute($file);
+
+            dump([
+                'file' => $file,
+                'length' => strlen($sql),
+            ]);
+        }
     }
 }
