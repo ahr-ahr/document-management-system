@@ -4,6 +4,7 @@ namespace App\Services\Auth;
 
 use App\Constants\Role;
 use App\Models\User;
+use App\Enums\SecuritySeverity;
 use App\Services\Security\SecurityLogService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -38,6 +39,7 @@ class AuthService
 
             $this->securityLog->record(
                 eventType: 'REGISTER_SUCCESS',
+                severity: SecuritySeverity::INFO->value,
                 userId: $user->id,
                 metadata: [
                     'name' => $user->name,
@@ -74,7 +76,7 @@ class AuthService
 
                 $this->securityLog->record(
                     eventType: 'LOGIN_FAILED',
-                    severity: 'warning',
+                    severity: SecuritySeverity::WARNING->value,
                     metadata: [
                         'email' => $email,
                     ],
@@ -94,7 +96,7 @@ class AuthService
                 $this->securityLog->record(
                     eventType: 'LOGIN_FAILED',
                     userId: $user->id,
-                    severity: 'warning',
+                    severity: SecuritySeverity::WARNING->value,
                     metadata: [
                         'reason' => 'inactive_account',
                     ],
@@ -121,6 +123,7 @@ class AuthService
 
             $this->securityLog->record(
                 eventType: 'LOGIN_SUCCESS',
+                severity: SecuritySeverity::INFO->value,
                 userId: $user->id,
                 metadata: [
                     'email' => $user->email,
