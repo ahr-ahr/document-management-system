@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\SecuritySeverity;
 use App\Services\Security\SecurityLogService;
 use Closure;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ class SecurityLogMiddleware
     ) {
     }
 
+
     public function handle(
         Request $request,
         Closure $next,
@@ -22,13 +24,32 @@ class SecurityLogMiddleware
         $response = $next($request);
 
 
+        $statusCode = $response->getStatusCode();
+
+
+        $severity = match (true) {
+
+            $statusCode >= 500 =>
+                SecuritySeverity::ERROR->value,
+
+
+            $statusCode >= 400 =>
+                SecuritySeverity::WARNING->value,
+
+
+            default =>
+                SecuritySeverity::INFO->value,
+        };
+
+
         $this->securityLog->record(
             eventType: 'HTTP_REQUEST',
             userId: auth()->id(),
+            severity: $severity,
             metadata: [
                 'endpoint' => $request->path(),
                 'method' => $request->method(),
-                'status' => $response->getStatusCode(),
+                'status' => $statusCode,
             ],
         );
 
