@@ -5,6 +5,19 @@ use App\Support\Response\ApiResponse;
 use Illuminate\Support\Facades\Route;
 use App\Services\Health\HealthCheckService;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Document\ProjectController;
+
+Route::get('/health', function (HealthCheckService $health) {
+
+    return ApiResponse::success(
+        data: [
+            ...$health->check(),
+            'timestamp' => now(),
+        ],
+        message: 'Application is healthy.',
+    );
+
+});
 
 Route::prefix('auth')->group(function () {
 
@@ -36,30 +49,23 @@ Route::prefix('auth')->group(function () {
 
 });
 
-Route::middleware([
-    'auth:sanctum',
-    'role:penilai',
-])
-->get('/test/penilai', function () {
+Route::middleware('auth:sanctum')
+    ->prefix('projects')
+    ->group(function () {
 
-    return ApiResponse::success(
-        message: 'Penilai access granted.',
-    );
+        Route::post(
+            '/',
+            [ProjectController::class, 'store']
+        );
 
-});
+        Route::get(
+            '/{project:uuid}',
+            [ProjectController::class, 'show']
+        );
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+        Route::put(
+            '/{project:uuid}',
+            [ProjectController::class, 'update']
+        );
 
-Route::get('/health', function (HealthCheckService $health) {
-
-    return ApiResponse::success(
-        data: [
-            ...$health->check(),
-            'timestamp' => now(),
-        ],
-        message: 'Application is healthy.',
-    );
-
-});
+    });

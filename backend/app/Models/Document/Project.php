@@ -53,4 +53,9 @@ class Project extends Model
             'current_status_id'
         );
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 }
