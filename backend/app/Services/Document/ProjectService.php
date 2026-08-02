@@ -72,33 +72,43 @@ class ProjectService
         array $data,
     ): Project {
 
-        $project->update([
-            'project_name' => $data['project_name']
-                ?? $project->project_name,
+        return DB::transaction(function () use (
+            $project,
+            $data
+        ) {
 
-            'description' => array_key_exists(
-                'description',
-                $data
-            )
-                ? $data['description']
-                : $project->description,
-        ]);
+            $project->update([
+                'project_name' => $data['project_name']
+                    ?? $project->project_name,
 
-
-        $this->securityLog->record(
-            eventType: 'PROJECT_UPDATED',
-            userId: $project->user_id,
-            severity: SecuritySeverity::INFO->value,
-            metadata: [
-                'project_id' => $project->id,
-                'project_code' => $project->project_code,
-            ],
-        );
+                'description' => array_key_exists(
+                    'description',
+                    $data
+                )
+                    ? $data['description']
+                    : $project->description,
+            ]);
 
 
-        return $project->load([
-            'status',
-            'applicant',
-        ]);
+            $project->refresh();
+
+
+            $this->securityLog->record(
+                eventType: 'PROJECT_UPDATED',
+                userId: $project->user_id,
+                severity: SecuritySeverity::INFO->value,
+                metadata: [
+                    'project_id' => $project->id,
+                    'project_code' => $project->project_code,
+                    'project_name' => $project->project_name,
+                ],
+            );
+
+
+            return $project->load([
+                'status',
+                'applicant',
+            ]);
+        });
     }
 }
