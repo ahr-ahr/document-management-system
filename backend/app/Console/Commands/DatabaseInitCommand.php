@@ -25,12 +25,18 @@ class DatabaseInitCommand extends Command
         $this->info('Starting database initialization...');
         $this->newLine();
 
-        $installer->initialize();
+        try {
+            $installer->initialize($this);
 
-        $this->newLine();
+            $this->newLine();
+            $this->info('Database initialization completed successfully.');
 
-        $this->info('Database initialization completed.');
+            return self::SUCCESS;
+        } catch (\Throwable $e) {
+            $this->newLine();
+            $this->error($e->getMessage());
 
-        return self::SUCCESS;
+            return self::FAILURE;
+        }
     }
 }

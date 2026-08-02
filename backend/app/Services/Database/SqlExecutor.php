@@ -2,15 +2,18 @@
 
 namespace App\Services\Database;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class SqlExecutor
 {
     /**
-     * Read SQL file contents.
+     * Execute SQL file.
      */
-    public function execute(string $file): string
+    public function execute(string $file): void
     {
-        return File::get($file);
+        $sql = File::get($file);
+
+        DB::unprepared($sql);
     }
 }

@@ -28,13 +28,13 @@ class SqlScanner
             'core',
             'master',
             'document',
+            'audit',
             'security',
             'functions',
             'views',
             'triggers',
             'indexes',
             'seed',
-            'audit',
         ];
 
         foreach ($directories as $directory) {

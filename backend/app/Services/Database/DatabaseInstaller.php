@@ -2,6 +2,8 @@
 
 namespace App\Services\Database;
 
+use Illuminate\Console\Command;
+
 class DatabaseInstaller
 {
     public function __construct(
@@ -10,17 +12,18 @@ class DatabaseInstaller
     ) {
     }
 
-    public function initialize(): void
+    public function initialize(Command $command): void
     {
         $files = $this->scanner->scan();
 
-        foreach ($files as $file) {
-            $sql = $this->executor->execute($file);
+        $databasePath = base_path('../database/');
 
-            dump([
-                'file' => $file,
-                'length' => strlen($sql),
-            ]);
+        foreach ($files as $file) {
+            $relativePath = str_replace($databasePath, '', $file);
+
+            $command->line("Executing: {$relativePath}");
+
+            $this->executor->execute($file);
         }
     }
 }
