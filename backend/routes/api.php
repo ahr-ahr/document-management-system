@@ -36,6 +36,18 @@ Route::prefix('auth')->group(function () {
 
 });
 
+Route::middleware([
+    'auth:sanctum',
+    'role:penilai',
+])
+->get('/test/penilai', function () {
+
+    return ApiResponse::success(
+        message: 'Penilai access granted.',
+    );
+
+});
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
