@@ -3,7 +3,6 @@
 namespace App\Services\Security;
 
 use App\Models\SecurityLog;
-use Illuminate\Http\Request;
 
 class SecurityLogService
 {
@@ -12,6 +11,7 @@ class SecurityLogService
         ?int $userId = null,
         string $severity = 'info',
         ?array $metadata = null,
+        ?int $statusCode = null,
     ): SecurityLog {
         return SecurityLog::create([
             'user_id' => $userId,
@@ -21,7 +21,8 @@ class SecurityLogService
             'ip_address' => request()->ip() ?? '0.0.0.0',
             'endpoint' => request()->path(),
             'http_method' => request()->method(),
-            'status_code' => http_response_code(),
+
+            'status_code' => $statusCode,
 
             'user_agent' => request()->userAgent(),
 

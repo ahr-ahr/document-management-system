@@ -46,6 +46,7 @@ class SecurityLogMiddleware
             eventType: 'HTTP_REQUEST',
             userId: auth()->id(),
             severity: $severity,
+            statusCode: $statusCode,
             metadata: [
                 'endpoint' => $request->path(),
                 'method' => $request->method(),

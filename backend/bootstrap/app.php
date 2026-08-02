@@ -7,12 +7,13 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Throwable;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -65,6 +66,34 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (
+            AuthorizationException $e,
+            Request $request,
+        ) {
+
+            if (! $request->expectsJson()) {
+                return null;
+            }
+
+            return ApiResponse::forbidden(
+                message: 'This action is unauthorized.',
+            );
+        });
+
+        $exceptions->render(function (
+            AccessDeniedHttpException $e,
+            Request $request,
+        ) {
+
+            if (! $request->expectsJson()) {
+                return null;
+            }
+
+            return ApiResponse::forbidden(
+                message: 'This action is unauthorized.',
+            );
+        });
+
+        $exceptions->render(function (
             UnauthorizedException $e,
             Request $request,
         ) {
@@ -92,7 +121,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (
-            Throwable $e,
+            \Throwable $e,
             Request $request,
         ) {
             report($e);
